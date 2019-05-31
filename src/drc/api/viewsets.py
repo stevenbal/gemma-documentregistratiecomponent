@@ -99,6 +99,24 @@ class EnkelvoudigInformatieObjectViewSet(NotificationViewSetMixin,
     notifications_kanaal = KANAAL_DOCUMENTEN
     audit = AUDIT_DRC
 
+    def get_object(self):
+        # Retrieve all versions of the object
+        qs = super().get_queryset().filter(uuid=self.kwargs['uuid']).order_by('-versie')
+
+        # Return a specific version, or the latest version
+        if 'versie' in self.request.query_params:
+            return qs.get(versie=self.request.query_params['versie'])
+        return qs.first()
+
+    def update(self, request, *args, **kwargs):
+        import ipdb; ipdb.set_trace()
+        obj = self.get_object()
+        for key, value in request.data.items():
+            setattr(obj, key, value)
+        obj.pk = None
+        obj.versie += 1
+        obj.save()
+
 
 class ObjectInformatieObjectViewSet(NotificationViewSetMixin,
                                     AuditTrailViewsetMixin,

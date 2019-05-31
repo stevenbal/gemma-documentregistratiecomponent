@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class InformatieObject(models.Model):
     uuid = models.UUIDField(
-        unique=True, default=_uuid.uuid4,
+        default=_uuid.uuid4,
         help_text='Unieke resource identifier (UUID4)'
     )
     identificatie = models.CharField(
@@ -140,6 +140,7 @@ class InformatieObject(models.Model):
         'datum': ondertekening_datum,
     })
 
+
     def unique_representation(self):
         return f"{self.bronorganisatie} - {self.identificatie}"
 
@@ -188,6 +189,15 @@ class EnkelvoudigInformatieObject(InformatieObject):
         'waarde': integriteit_waarde,
         'datum': integriteit_datum,
     })
+
+    versie = models.PositiveIntegerField(default=1)
+
+    # def save(self, *args, **kwargs):
+    #     # super().save(*args, **kwargs)
+    #     import ipdb; ipdb.set_trace()
+
+    class Meta:
+        unique_together = ('uuid', 'versie')
 
 
 class Gebruiksrechten(models.Model):
